@@ -4,9 +4,9 @@ pragma solidity ^0.8.8;
 import { Error } from "./libraries/Error.sol";
 import { Event } from "./libraries/Event.sol";
 import { IERC20 } from "contracts/interfaces/IERC20.sol";
+import { StakingToken } from "./StakingToken.sol";
 
 contract Staking {
-    uint constant ONE_YEAR = 365 days;
     address stakingOperator;
     IERC20 token;
 
@@ -90,13 +90,16 @@ contract Staking {
 
         stake.amount = 0; 
 
-        token.transferFrom(stakingOperator, msg.sender, reward + amount);
+        StakingToken tokenContract = StakingToken(address(token)); // assuming token is the address of your token
+        address ownerAddress = tokenContract.owner();
+
+        token.transferFrom(ownerAddress, msg.sender, reward + amount);
     }
 
     function calculateReward(uint8 _poolId) 
     internal
     view 
-    returns (uint apy) 
+    returns (uint reward) 
     {
         // A is the future value of the investment/loan, including interest.
         // P is the principal investment amount (initial deposit or loan amount).
@@ -105,8 +108,18 @@ contract Staking {
 
         PoolInfo memory pool = pools[_poolId];
         StakeInfo memory stake = stakes[_poolId][msg.sender];
-        uint noOfdaysStaked = (stake.endedAt - stake.startedAt) / 1 days;
+        require(stake.startedAt / 1 days > 1, Error.CLAIM_AFTER_24_HOURS());
 
-        apy = stake.amount * (uint256(1) + (uint256(pool.percentageYield) / 100)) ** (noOfdaysStaked / ONE_YEAR);
+        uint noOfdaysStaked = (stake.endedAt - stake.startedAt) / 1 days;
+        uint yearsStaked = noOfdaysStaked / 365;
+
+        uint r = pool.percentageYield / 100;
+        uint P = stake.amount;
+
+        // Calculate reward using the formula: A = P * (1 + r/n)^(nt)
+        uint rewardFactor = (100 + r);  // (1 + r), where r is in percentage, so add 100
+        reward = P * rewardFactor * yearsStaked / 100;  // Applying simple reward calculation without exponentiation
+
+        return reward;
     }
 }

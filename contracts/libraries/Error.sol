@@ -14,4 +14,6 @@ library Error {
     error ADDRESS_NOT_SUPPORTED();
 
     error INSUFICIENT_STAKE_BALANCE();
+
+    error CLAIM_AFTER_24_HOURS();
 }

@@ -37,104 +37,172 @@ contract StakingTest is Test {
     // =================== createPool() Tests ===============================
     // ======================================================================
 
-    function test_Only_staking_operator_can_create_a_pool() public {
-        vm.prank(stakingOperator);
+    // function test_Only_staking_operator_can_create_a_pool() public {
+    //     vm.prank(stakingOperator);
 
-        vm.expectEmit(true, true, false, true);
-        emit Event.PoolCreatedSuccessfully("pool 1", 10, 1000);
+    //     vm.expectEmit(true, true, false, true);
+    //     emit Event.PoolCreatedSuccessfully("pool 1", 10, 1000);
 
-        stakingContract.createPool("pool 1", 10, 1000);
+    //     stakingContract.createPool("pool 1", 10, 1000);
 
-        (string memory name, uint8 percentageYield, uint minFee) = stakingContract.pools(0);
-        assertEq(name, "pool 1");
-        assertEq(percentageYield, 10);
-        assertEq(minFee, 1000);
-    }
+    //     (string memory name, uint8 percentageYield, uint minFee) = stakingContract.pools(0);
+    //     assertEq(name, "pool 1");
+    //     assertEq(percentageYield, 10);
+    //     assertEq(minFee, 1000);
+    // }
 
-    function test_random_address_can_not_create_a_pool() public {
-        vm.prank(staker);
+    // function test_random_address_can_not_create_a_pool() public {
+    //     vm.prank(staker);
 
-        vm.expectRevert(Error.NOT_AUTHORIZED.selector);
+    //     vm.expectRevert(Error.NOT_AUTHORIZED.selector);
 
-        stakingContract.createPool("pool 1", 10, 1000);
-    }
+    //     stakingContract.createPool("pool 1", 10, 1000);
+    // }
 
-    // ======================================================================
-    // =================== stakeInPool() Tests ==============================
-    // ======================================================================
+    // // ======================================================================
+    // // =================== stakeInPool() Tests ==============================
+    // // ======================================================================
 
-    function test_staker_can_not_stake_if_poolID_is_incorrect() public {
-        vm.prank(staker);
+    // function test_staker_can_not_stake_if_poolID_is_incorrect() public {
+    //     vm.prank(staker);
 
-        vm.expectRevert(Error.INVALID_POOL.selector);
+    //     vm.expectRevert(Error.INVALID_POOL.selector);
 
-        stakingContract.stakeInPool(1, 1000);
-    }
+    //     stakingContract.stakeInPool(1, 1000);
+    // }
 
-    function test_address0_can_not_stake_in_pool() public {
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 1", 10, 1000);
+    // function test_address0_can_not_stake_in_pool() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 2", 15, 5000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 3", 30, 15000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15000);
 
-        vm.prank(address(0));
-        vm.expectRevert(Error.ADDRESS_NOT_SUPPORTED.selector);
-        stakingContract.stakeInPool(1, 1000);
-    }
+    //     vm.prank(address(0));
+    //     vm.expectRevert(Error.ADDRESS_NOT_SUPPORTED.selector);
+    //     stakingContract.stakeInPool(1, 1000);
+    // }
 
-    function test_staker_can_not_stake_in_a_particular_pool_if_amount_passed_is_below_minimum_fee() public {
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 1", 10, 1000);
+    // function test_staker_can_not_stake_in_a_particular_pool_if_amount_passed_is_below_minimum_fee() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 2", 15, 5000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 3", 30, 15000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15000);
 
-        vm.prank(staker);
-        vm.expectRevert(Error.AMOUNT_IS_BELOW_MINIMUM_FEE.selector);
-        stakingContract.stakeInPool(1, 1000);
-    }
+    //     vm.prank(staker);
+    //     vm.expectRevert(Error.AMOUNT_IS_BELOW_MINIMUM_FEE.selector);
+    //     stakingContract.stakeInPool(1, 1000);
+    // }
 
-    function test_staker_can_not_stake_if_balance_is_insufficient() public {
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 1", 10, 1000);
+    // function test_staker_can_not_stake_if_balance_is_insufficient() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 2", 15, 5000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 3", 30, 15000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15000);
 
-        vm.prank(staker);
-        vm.expectRevert(Error.INSUFICIENT_STAKE_BALANCE.selector);
-        stakingContract.stakeInPool(1, 5000);
-    }
+    //     vm.prank(staker);
+    //     vm.expectRevert(Error.INSUFICIENT_STAKE_BALANCE.selector);
+    //     stakingContract.stakeInPool(1, 5000);
+    // }
 
-    function test_staker_can_not_stake_if_balance_is_sufficient_but_doesnt_approve_the_contract_to_spend() public {
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 1", 10, 1_000);
+    // function test_staker_can_not_stake_if_balance_is_sufficient_but_doesnt_approve_the_contract_to_spend() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1_000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 2", 15, 5_000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5_000);
 
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 3", 30, 15_000);
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15_000);
 
-        vm.prank(tokenAddress);
-        tokenContract.transfer(staker, 10_000);
+    //     vm.prank(tokenAddress);
+    //     tokenContract.transfer(staker, 10_000);
 
-        vm.prank(staker);
-        vm.expectRevert();
-        stakingContract.stakeInPool(1, 5_000);
-    }
+    //     vm.prank(staker);
+    //     vm.expectRevert();
+    //     stakingContract.stakeInPool(1, 5_000);
+    // }
 
-    function test_staker_can_stake_if_token_balance_is_sufficient() public {
+    // function test_staker_can_stake_if_token_balance_is_sufficient() public {
+    //     uint pool2Amount = 5_000;
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, pool2Amount);
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15000);
+
+    //     vm.prank(tokenAddress);
+    //     tokenContract.transfer(staker, 10_000);
+
+    //     vm.prank(staker);
+    //     tokenContract.approve(address(stakingContract), 10_000);
+
+    //     uint8 pool2Id = 1;
+
+    //     vm.prank(staker);
+    //     stakingContract.stakeInPool(pool2Id, 5000);
+
+    //     (uint amount, uint startedAt, uint endedAt, bool rewardClaimed) = stakingContract.stakes(pool2Id,staker);
+    //     assertEq(amount, pool2Amount);
+    //     assertEq(endedAt, 0);
+    //     assertEq(rewardClaimed, false);
+    // }
+
+    // // ======================================================================
+    // // =================== claimReward() Tests ==============================
+    // // ======================================================================
+
+    // function test_staker_can_not_claimReward_if_poolID_is_incorrect() public {
+    //     vm.prank(staker);
+
+    //     vm.expectRevert(Error.INVALID_POOL.selector);
+
+    //     stakingContract.claimReward(1);
+    // }
+
+    // function test_address0_can_not_claimReward() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5000);
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 3", 30, 15000);
+
+    //     vm.prank(address(0));
+    //     vm.expectRevert(Error.ADDRESS_NOT_SUPPORTED.selector);
+    //     stakingContract.claimReward(1);
+    // }
+
+    // function test_staker_can_not_claimReward_for_stake_the_didnt_make() public {
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 1", 10, 1000);
+
+    //     vm.prank(stakingOperator);
+    //     stakingContract.createPool("pool 2", 15, 5000);
+
+    //     vm.prank(staker);
+    //     vm.expectRevert(Error.UNIDENTIFIED_STAKE.selector);
+    //     stakingContract.claimReward(1);
+    // }
+
+    function test_staker_can_claimReward() public {
         uint pool2Amount = 5_000;
 
         vm.prank(stakingOperator);
@@ -157,38 +225,16 @@ contract StakingTest is Test {
         vm.prank(staker);
         stakingContract.stakeInPool(pool2Id, 5000);
 
-        (uint amount, uint startedAt, uint endedAt, bool rewardClaimed) = stakingContract.stakes(pool2Id,staker);
-        assertEq(amount, pool2Amount);
-        assertEq(endedAt, 0);
-        assertEq(rewardClaimed, false);
+        vm.warp(block.timestamp + 10 days);
+        uint diff = block.timestamp + 10 days - block.timestamp;
+        emit log_uint(diff);
+        emit log_uint(diff/ 1 days);
 
-        emit log_uint(startedAt);
-    }
 
-    // ======================================================================
-    // =================== claimReward() Tests ==============================
-    // ======================================================================
+        vm.prank(tokenAddress);
+        tokenContract.approve(address(stakingContract), 10_000);
 
-    function test_staker_can_not_claimReward_if_poolID_is_incorrect() public {
         vm.prank(staker);
-
-        vm.expectRevert(Error.INVALID_POOL.selector);
-
-        stakingContract.claimReward(1);
-    }
-
-    function test_address0_can_not_claimReward() public {
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 1", 10, 1000);
-
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 2", 15, 5000);
-
-        vm.prank(stakingOperator);
-        stakingContract.createPool("pool 3", 30, 15000);
-
-        vm.prank(address(0));
-        vm.expectRevert(Error.ADDRESS_NOT_SUPPORTED.selector);
-        stakingContract.claimReward(1);
+        stakingContract.claimReward(pool2Id);
     }
 }

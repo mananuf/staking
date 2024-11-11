@@ -24,10 +24,10 @@ contract Staking {
         bool rewardClaimed;
     }
 
-    mapping(uint => mapping(address => StakeInfo)) stakes;
+    mapping(uint => mapping(address => StakeInfo)) public stakes;
 
-    constructor(address _deployer, address _token) {
-        stakingOperator = _deployer;
+    constructor(address _token) {
+        stakingOperator = msg.sender;
         token = IERC20(_token);
     }
 
@@ -53,8 +53,8 @@ contract Staking {
 
     function stakeInPool(uint8 _poolId, uint _amount) external {
         require(msg.sender != address(0), Error.ADDRESS_NOT_SUPPORTED());
-        require(pools.length > 0, Error.UNIDENTIFIED_STAKE());
-        require(_poolId < pools.length, Error.UNIDENTIFIED_STAKE());
+        require(pools.length > 0, Error.INVALID_POOL());
+        require(_poolId < pools.length, Error.INVALID_POOL());
 
         PoolInfo memory selectedPool = pools[_poolId];
 
@@ -74,9 +74,11 @@ contract Staking {
     }
 
     function claimReward(uint8 _poolId) external {
+        require(msg.sender != address(0), Error.ADDRESS_NOT_SUPPORTED());
+        require(_poolId < pools.length, Error.INVALID_POOL());
+        
         StakeInfo memory stake = stakes[_poolId][msg.sender];
 
-        require(msg.sender != address(0), Error.ADDRESS_NOT_SUPPORTED());
         require(stake.startedAt != 0, Error.UNIDENTIFIED_STAKE());
         require(stake.amount != 0, Error.INSUFICIENT_STAKE_BALANCE());
 

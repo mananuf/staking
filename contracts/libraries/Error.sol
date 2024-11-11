@@ -3,7 +3,7 @@ pragma solidity ^0.8.8;
 
 library Error {
 
-    error Not_AUTHORIZED();
+    error NOT_AUTHORIZED();
 
     error INVALID_POOL();
 

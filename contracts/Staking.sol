@@ -13,9 +13,9 @@ contract Staking {
     struct PoolInfo {
         string name;
         uint8 percentageYield;
-        uint8 minFee;
+        uint minFee;
     }
-    PoolInfo[] pools;
+    PoolInfo[] public pools;
 
     struct StakeInfo{
         uint amount;
@@ -32,11 +32,11 @@ contract Staking {
     }
 
     modifier onlyStakingOperator {
-        require(msg.sender == stakingOperator, Error.Not_AUTHORIZED());
+        require(msg.sender == stakingOperator, Error.NOT_AUTHORIZED());
         _;
     }
 
-    function createPool(string memory _name, uint8 _percentageYield, uint8 _minFee) 
+    function createPool(string memory _name, uint8 _percentageYield, uint _minFee) 
     external 
     onlyStakingOperator {
 
@@ -52,13 +52,14 @@ contract Staking {
     }
 
     function stakeInPool(uint8 _poolId, uint _amount) external {
+        require(msg.sender != address(0), Error.ADDRESS_NOT_SUPPORTED());
+        require(pools.length > 0, Error.UNIDENTIFIED_STAKE());
+        require(_poolId < pools.length, Error.UNIDENTIFIED_STAKE());
 
         PoolInfo memory selectedPool = pools[_poolId];
 
-        require(msg.sender != address(0));
-        require(selectedPool.minFee != 0, Error.INVALID_POOL());
-        require(selectedPool.minFee < _amount, Error.AMOUNT_IS_BELOW_MINIMUM_FEE());
-        require(token.balanceOf(msg.sender) > _amount, Error.INSUFICIENT_STAKE_BALANCE());
+        require(selectedPool.minFee <= _amount, Error.AMOUNT_IS_BELOW_MINIMUM_FEE());
+        require(token.balanceOf(msg.sender) >= _amount, Error.INSUFICIENT_STAKE_BALANCE());
     
         token.transferFrom(msg.sender, address(this), _amount);
         

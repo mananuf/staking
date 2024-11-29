@@ -64,3 +64,6 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+token = 0x49aC2AD1785d9577aF52a4Cd1511DcCC3AC42704
+stakingContract = 0x85b64A71E684FE7b1527D826B1C5e2c6439ecA8b
